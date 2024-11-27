@@ -1,12 +1,31 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet,  View } from 'react-native';
+
+// fonts
+import { useFonts } from 'expo-font';
+
+// theme
+import { ThemeProvider, Text } from '@rneui/themed';
+import { theme } from './style/theme';
 
 export default function App() {
+
+  let [fontsLoaded] = useFonts({
+    'RethinkSans_Normal': require('./assets/fonts/RethinkSans-VariableFont_wght.ttf'),
+    'RethinkSans_Italic': require('./assets/fonts/RethinkSans-Italic-VariableFont_wght.ttf'),
+  });
+
+  if (!fontsLoaded) {
+    return null;
+  }
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <ThemeProvider theme={theme}>
+      <View style={styles.container}>
+        <Text h1>whether</Text>
+        <StatusBar style="auto" />
+      </View>
+    </ThemeProvider>
   );
 }
 
