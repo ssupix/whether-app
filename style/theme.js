@@ -20,22 +20,36 @@ export const theme = createTheme ({
                 textTransform: 'lowercase',
                 fontWeight: 'regular',
                 letterSpacing: -2.5,
+                color: '#F5F1F0'
             },
             h2Style: {
-                fontSize: 32,
-                fontFamily: 'RethinkSans_Normal'
+                fontSize: 24,
+                fontFamily: 'RethinkSans_Normal',
+                textTransform: 'lowercase',
+                fontWeight: 'regular',
+                letterSpacing: -1,
+                color: '#F5F1F0',
             },
             h3Style: {
                 fontSize: 20,
-                fontFamily: 'RethinkSans_Normal'
+                fontFamily: 'RethinkSans_Normal',
+                textTransform: 'lowercase',
+                fontWeight: 'bold',
+                letterSpacing: -.8,
             },
             h4Style: {
                 fontSize: 13,
-                fontFamily: 'RethinkSans_Normal'
+                fontFamily: 'RethinkSans_Normal',
+                textTransform: 'lowercase',
+                fontWeight: 'regular',
+                letterSpacing: -2.5,
             },
             bodyStyle: {
                 fontSize: 20,
-                fontFamily: 'RethinkSans_Normal'
+                fontFamily: 'RethinkSans_Normal',
+                textTransform: 'lowercase',
+                fontWeight: 'regular',
+                letterSpacing: -.8,
             },
         },
     },

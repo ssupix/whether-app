@@ -55,7 +55,7 @@ const App = () => {
               headerShown: false, // Optionally hide header for all screens
               tabBarShowLabel: false,
               tabBarStyle: {
-                backgroundColor: theme.colors.lightGrey,
+                backgroundColor: '#D0CCC7',
                 borderTopWidth: 0,
                 alignItems: 'center',
                 paddingTop: 10,
