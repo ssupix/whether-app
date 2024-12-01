@@ -53,9 +53,9 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
     main: {
+        padding: 30,
         flex: 1,
         backgroundColor: theme.colors.grey,
-        padding: 30,
     },
     image: {
         width: 100,
@@ -70,6 +70,7 @@ const styles = StyleSheet.create({
         color: '#F5F1F0'
     },
     container: {
+        position: 'relative',
         width: '100%',
         flex: 1,
         flexDirection: 'column',
@@ -77,14 +78,13 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         textAlign: 'center',
         tintColor: '#F5F1F0',
-        position: 'relative',
     },
     circle: {
         position: 'absolute',
         width: "110%",
+        flex: 1,
         justifyContent: 'center',
         alignItems: 'center',   
-        flex: 1,
     },
     image: {
         width: 500,
@@ -100,8 +100,9 @@ const styles = StyleSheet.create({
     dataSection: {
         flex: 1,
         flexDirection: 'column',
-        justifyContent: 'end',
+        justifyContent: 'flex-end',
         gap: 0,
+        paddingBottom: 40,
     },
     dataRow: {
         width: '100%',
@@ -109,6 +110,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'flex-end',
         justifyContent: 'space-between',
+        maxHeight: 100,
     },
     data: {
         flex: 1,
