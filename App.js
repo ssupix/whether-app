@@ -80,7 +80,7 @@ const App = () => {
               component={Details}
               options={({ route }) => ({
                 title: route.params.item.name, // Dynamically set the title
-                headerStyle: { backgroundColor: theme.colors.grey },
+                headerStyle: { backgroundColor: theme.colors.lightGrey },
                 headerTintColor: theme.colors.white,
               })}
             />

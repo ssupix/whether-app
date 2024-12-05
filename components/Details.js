@@ -12,17 +12,24 @@ import { theme } from '../style/theme';
 export default function Details({ route }) {
     const { item } = route.params;
 
+    const getCircleImage = (temperature) => {
+        if (temperature < 7) {
+            return blue;
+        } else if (temperature >= 7 && temperature <= 15) {
+            return yellow;
+        } else {
+            return orange;
+        }
+    };
+
+
     return (
         <View style={styles.main}>
 
             <View style={styles.circle}>
-                <Image source={orange} style={styles.image} />
+                <Image source={getCircleImage(item.temperature)} style={styles.image} />
             </View>
 
-            <View style={styles.header}>
-                <Text h2>{item.name}</Text>
-                <Ionicons name="heart-outline" size={30} color="white"/>
-            </View>
             <View style={styles.container}>
                 <Text h1>{item.temperature}°</Text>
                 <Text style={styles.description}>{item.type}</Text>
@@ -84,6 +91,7 @@ const styles = StyleSheet.create({
     circle: {
         position: 'absolute',
         width: "110%",
+        height: "60%",
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',   
