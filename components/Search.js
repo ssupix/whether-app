@@ -1,15 +1,18 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, TextInput } from 'react-native';
-import { Text, Icon } from '@rneui/themed';
+import { StyleSheet, View, TextInput, TouchableOpacity } from 'react-native';
+import { Text, ListItem } from '@rneui/themed';
 import { Ionicons } from '@expo/vector-icons';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import { data } from '../data/fakeWeather';
 import { theme } from '../style/theme';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useNavigation } from '@react-navigation/native';
 
 export default function SearchScreen() {
     const [searchTerm, setSearchTerm] = useState('');
     const [filteredData, setFilteredData] = useState(data);
-
+    const navigation = useNavigation();
+    
     const handleSearch = (text) => {
         setSearchTerm(text);
         const filtered = data.filter((item) =>
@@ -19,34 +22,48 @@ export default function SearchScreen() {
     };
 
     const renderItem = ({ item }) => (
-        <View style={[styles.itemContainer, getColorStyle(item.temperature)]}>
-            <View style={styles.itemDetails}>
-                <Text style={[styles.itemText, getColorStyle(item.temperature)]}>
-                {item.name}
+        
+            <ListItem.Swipeable
+                linearGradientProps={
+                    getColorStyle(item.temperature)
+                }
+                ViewComponent={LinearGradient}
+                leftWidth={0}
+                rightWidth={60}
+                minSlideWidth={40}
+                style={styles.itemContainer}
+                rightContent={() => (
+                    <TouchableOpacity style={styles.hiddenItemContainer}>
+                        <Ionicons name="heart-outline" size={24} color={theme.colors.lightGrey} />
+                    </TouchableOpacity>
+                )}
+            >
+                <TouchableOpacity 
+                    style={styles.itemContent}
+                    onPress={() => navigation.navigate('Details', { item })}
+                >
+                <ListItem.Content style={styles.itemDetails}>
+                    <ListItem.Title style={styles.itemText}>
+                        {item.name}
+                    </ListItem.Title>
+                    <ListItem.Subtitle>
+                        {item.type}
+                    </ListItem.Subtitle>
+                </ListItem.Content>
+                <Text style={styles.itemTemp}>
+                    {item.temperature}°
                 </Text>
-                <Text>
-                    {item.type}
-                </Text>
-            </View>
-            <Text style={styles.itemTemp}>
-                {item.temperature}°
-            </Text>
-        </View>
-    );
-
-    const renderHiddenItem = ({ item }) => (
-        <View style={styles.hiddenItemContainer}>
-            <Ionicons name="heart-outline" size={24} color={theme.colors.lightGrey} />
-        </View>
+                </TouchableOpacity>
+            </ListItem.Swipeable>
     );
 
     const getColorStyle = (temperature) => {
         if (temperature < 7) {
-        return styles.blue;
+        return {colors: ["#4464A9", "#BDB6AD"], start: { x: 1, y: 0 }, end: { x: 0.6, y: 0 }};
         } else if (temperature >= 7 && temperature <= 15) {
-        return styles.yellow;
+        return {colors: ["#C88F34", "#BDB6AD"], start: { x: 1, y: 0 }, end: { x: 0.6, y: 0 }};
         } else {
-        return styles.orange;
+        return {colors: ["#C85934", "#BDB6AD"], start: { x: 1, y: 0 }, end: { x: 0.6, y: 0 }};
         }
     };
 
@@ -68,7 +85,6 @@ export default function SearchScreen() {
                 data={filteredData}
                 keyExtractor={(item) => item.name}
                 renderItem={renderItem}
-                renderHiddenItem={renderHiddenItem}
                 leftActivationValue={100}
                 leftActionValue={0}
                 leftActionActivationValue={100}
@@ -108,14 +124,14 @@ const styles = StyleSheet.create({
         marginLeft: 8,
     },
     itemContainer: {
+        borderTopColor: theme.colors.lightGrey,
+        borderTopWidth: 2,
+    },
+    itemContent: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        backgroundColor: theme.colors.grey,
-        borderTopColor: theme.colors.lightGrey,
-        borderTopWidth: 2,
-        paddingHorizontal: 16,
-        paddingVertical: 12,
+        width: '100%'
     },
     itemDetails: {
         flex: 1,
@@ -137,9 +153,8 @@ const styles = StyleSheet.create({
     hiddenItemContainer: {
         flex: 1,
         justifyContent: 'center',
-        alignItems: 'flex-end',
+        alignItems: 'center',
         margin: 8,
-        paddingTop: 8,
     },
     blue: {
         backgroundColor: theme.colors.blue,
