@@ -101,12 +101,9 @@ const styles = StyleSheet.create({
         backgroundColor: theme.colors.grey,
     },
     header: {
-        flex: 1,
-        flexDirection: 'row',
-        justifyContent: 'space-between',
         maxHeight: 30,
         marginTop: 40,
-        color: '#F5F1F0'
+        color: theme.colors.lightGrey
     },
     searchContainer: {
         flexDirection: 'row',
