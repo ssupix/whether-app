@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -17,6 +17,7 @@ import Home from './components/Home';
 import Search from './components/Search';
 import SavedLocations from './components/SavedLocations';
 import Details from './components/Details';
+import SplashScreen from './components/SplashScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -56,6 +57,16 @@ const TabNavigator = () => (
 
 // App Component
 const App = () => {
+
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // loading simulation lol
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 3000);
+  }, []);
+
   let [fontsLoaded] = useFonts({
     'RethinkSans_Normal': require('./assets/fonts/RethinkSans-VariableFont_wght.ttf'),
     'RethinkSans_Italic': require('./assets/fonts/RethinkSans-Italic-VariableFont_wght.ttf'),
@@ -69,22 +80,26 @@ const App = () => {
     <ThemeProvider theme={theme}>
       <SafeAreaProvider>
         <NavigationContainer>
-          <Stack.Navigator>
-            <Stack.Screen
-              name="Tabs"
-              component={TabNavigator}
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name="Details"
-              component={Details}
-              options={({ route }) => ({
-                title: route.params.item.name, // Dynamically set the title
-                headerStyle: { backgroundColor: theme.colors.lightGrey },
-                headerTintColor: theme.colors.white,
-              })}
-            />
-          </Stack.Navigator>
+          {isLoading ? (
+            <SplashScreen />
+          ) : (
+            <Stack.Navigator>
+              <Stack.Screen
+                name="Tabs"
+                component={TabNavigator}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="Details"
+                component={Details}
+                options={({ route }) => ({
+                  title: route.params.item.name,
+                  headerStyle: { backgroundColor: theme.colors.lightGrey },
+                  headerTintColor: theme.colors.white,
+                })}
+              />
+            </Stack.Navigator>
+          )}
         </NavigationContainer>
       </SafeAreaProvider>
     </ThemeProvider>
