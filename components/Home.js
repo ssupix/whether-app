@@ -1,4 +1,4 @@
-import { StyleSheet, View, Image } from 'react-native';
+import { StyleSheet, View, Image, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 import orange from '../assets/png/orange.png';
@@ -10,18 +10,35 @@ import { theme } from '../style/theme';
 
 export default function HomeScreen() {
 
+    // uncomment this if you want to use the getCircleImage function
+    // it only will work with mapped data
+
+    // const getCircleImage = (temperature) => {
+    //     if (temperature < 7) {
+    //         return blue;
+    //     } else if (temperature >= 7 && temperature <= 15) {
+    //         return yellow;
+    //     } else {
+    //         return orange;
+    //     }
+    // };
+
     return (
         <View style={styles.main}>
 
             <View style={styles.circle}>
-                <Image source={orange} style={styles.image} />
+                {/* <Image source={getCircleImage(item.temperature)} style={styles.image} /> */}
+                <Image source={blue} style={styles.image} />
             </View>
 
             <View style={styles.header}>
                 <Text h2>Vancouver</Text>
-                <Ionicons name="heart-outline" size={30} color="white"/>
+                <TouchableOpacity>
+                    <Ionicons name="heart-outline" size={30} color="white"/>
+                </TouchableOpacity>
             </View>
             <View style={styles.container}>
+                {/* you would add the temperature here for background color function to work, I assumed its gon be item.temperature */}
                 <Text h1>5°</Text>
                 <Text style={styles.description}>its cold and its raining.</Text>
             </View>
@@ -32,18 +49,18 @@ export default function HomeScreen() {
                         <Text style={theme.components.Text.bodyStyle}>17km/h</Text>
                     </View>
                     <View style={styles.data}>
-                        <Text h3>wind speed</Text>
-                        <Text style={theme.components.Text.bodyStyle}>17km/h</Text>
+                        <Text h3>pressure</Text>
+                        <Text style={theme.components.Text.bodyStyle}>1021hPa</Text>
                     </View>
                 </View>
                 <View style={styles.dataRow}>
                     <View style={styles.data}>
-                        <Text h3>wind speed</Text>
-                        <Text style={theme.components.Text.bodyStyle}>17km/h</Text>
+                        <Text h3>coldest</Text>
+                        <Text style={theme.components.Text.bodyStyle}>-2°</Text>
                     </View>
                     <View style={styles.data}>
-                        <Text h3>wind speed</Text>
-                        <Text style={theme.components.Text.bodyStyle}>17km/h</Text>
+                        <Text h3>hottest</Text>
+                        <Text style={theme.components.Text.bodyStyle}>5°</Text>
                     </View>
                 </View>
             </View>
