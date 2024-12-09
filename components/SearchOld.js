@@ -1,4 +1,5 @@
 export default function SearchScreen() {
+
     const [searchQuery, setSearchQuery] = useState('');
     const [locationData, setLocationData] = useState([]);
     const [loading, setLoading] = useState(false);

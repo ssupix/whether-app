@@ -10,49 +10,61 @@ import { Text } from '@rneui/themed';
 import { theme } from '../style/theme';
 
 export default function Details({ route }) {
+    
     const { item } = route.params;
 
-    const getCircleImage = (temperature) => {
-        if (temperature < 7) {
+    const getCircleImage = (temp) => {
+        if (temp < 7) {
             return blue;
-        } else if (temperature >= 7 && temperature <= 15) {
+        } else if (temp >= 7 && temp <= 15) {
             return yellow;
         } else {
             return orange;
         }
     };
 
+    const getDescription = (temp) => {
+        if (temp < 7) {
+            return 'cold';
+        } else if (temp >= 7 && temp <= 15) {
+            return 'warm';
+        } else {
+            return 'hot';
+        }
+    };
+
+    console.log(item);
 
     return (
         <View style={styles.main}>
 
             <View style={styles.circle}>
-                <Image source={getCircleImage(item.temperature)} style={styles.image} />
+                <Image source={getCircleImage(item.temp)} style={styles.image} />
             </View>
 
             <View style={styles.container}>
-                <Text h1>{item.temperature}°</Text>
-                <Text style={styles.description}>{item.type}</Text>
+                <Text h1>{item.temp}°</Text>
+                <Text style={styles.description}>its {getDescription(item.temp)} - {item.weather}.</Text>
             </View>
             <View style={styles.dataSection}>
                 <View style={styles.dataRow}>
                     <View style={styles.data}>
                         <Text h3>wind speed</Text>
-                        <Text style={theme.components.Text.bodyStyle}>17km/h</Text>
+                        <Text style={theme.components.Text.bodyStyle}>{item.windSpeed} m/s</Text>
                     </View>
                     <View style={styles.data}>
-                        <Text h3>wind speed</Text>
-                        <Text style={theme.components.Text.bodyStyle}>17km/h</Text>
+                        <Text h3>pressure</Text>
+                        <Text style={theme.components.Text.bodyStyle}>{item.pressure} hPa</Text>
                     </View>
                 </View>
                 <View style={styles.dataRow}>
                     <View style={styles.data}>
-                        <Text h3>wind speed</Text>
-                        <Text style={theme.components.Text.bodyStyle}>17km/h</Text>
+                        <Text h3>coldest</Text>
+                        <Text style={theme.components.Text.bodyStyle}>{item.minTemp}°C</Text>
                     </View>
                     <View style={styles.data}>
-                        <Text h3>wind speed</Text>
-                        <Text style={theme.components.Text.bodyStyle}>17km/h</Text>
+                        <Text h3>hottest</Text>
+                        <Text style={theme.components.Text.bodyStyle}>{item.maxTemp}°C</Text>
                     </View>
                 </View>
             </View>
@@ -85,6 +97,7 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
+        marginTop: 60,
         textAlign: 'center',
         tintColor: '#F5F1F0',
     },

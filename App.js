@@ -94,7 +94,11 @@ const App = () => {
                 component={Details}
                 options={({ route }) => ({
                   title: route.params.item.name,
-                  headerStyle: { backgroundColor: theme.colors.lightGrey },
+                  headerTitleStyle: {
+                    fontFamily: 'RethinkSans_Normal',
+                    textTransform: 'lowercase' 
+                  },
+                  headerStyle: { backgroundColor: theme.colors.grey },
                   headerTintColor: theme.colors.white,
                 })}
               />

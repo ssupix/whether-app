@@ -39,8 +39,9 @@ const styles = StyleSheet.create({
         marginTop: 40,
     },
     quote: {
-        fontSize: 20,
+        fontSize: 18,
         color: theme.colors.darkGrey,
+        opacity: 0.8,
         fontStyle: 'italic',
         marginTop: 20,
     },
