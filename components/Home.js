@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Image, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -10,60 +11,112 @@ import { theme } from '../style/theme';
 
 export default function HomeScreen() {
 
+    const [weatherData, setWeatherData] = useState([null]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+
+    const apiKey = 'ee849bbc68bf05c148d0718840dcb225';
+    const apiUrl = 'https://api.openweathermap.org/data/2.5/weather';
+
+    const fetchWeather = async () => {
+        setLoading(true);
+        setError(null);
+
+        try {
+            const response = await fetch(`${apiUrl}?q=Vancouver&appid=${apiKey}&units=metric`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch location data');
+            }
+
+            const data = await response.json();
+
+            setWeatherData({
+                temp: `${Math.round(data.main.temp)}`, // Temperature is rounded to the nearest integer in Celsius
+                weather: data.weather[0].description, // Weather description
+                windSpeed: data.wind.speed, // Wind speed
+                pressure: data.main.pressure, // Pressure
+                minTemp: Math.round(data.main.temp_min), // Minimum temperature
+                maxTemp: Math.round(data.main.temp_max), // Maximum temperature
+            });
+
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchWeather();
+    }, [])
+
     // uncomment this if you want to use the getCircleImage function
     // it only will work with mapped data
 
-    // const getCircleImage = (temperature) => {
-    //     if (temperature < 7) {
-    //         return blue;
-    //     } else if (temperature >= 7 && temperature <= 15) {
-    //         return yellow;
-    //     } else {
-    //         return orange;
-    //     }
-    // };
+    const getCircleImage = (temp) => {
+        if (temp < 7) {
+            return blue;
+        } else if (temp >= 7 && temp <= 15) {
+            return yellow;
+        } else {
+            return orange;
+        }
+    };
+
+    const getDescription = (temp) => {
+        if (temp < 7) {
+            return 'cold';
+        } else if (temp >= 7 && temp <= 15) {
+            return 'warm';
+        } else {
+            return 'hot';
+        }
+    };
 
     return (
         <View style={styles.main}>
+            {loading && <Text style={styles.header}>Loading...</Text>}
+            {error && <Text style={styles.header}>Error: {error}</Text>}
+            {weatherData && (
+                <>
+                    <View style={styles.circle}>
+                        <Image source={getCircleImage(weatherData.temp)} style={styles.image} />
+                    </View>
 
-            <View style={styles.circle}>
-                {/* <Image source={getCircleImage(item.temperature)} style={styles.image} /> */}
-                <Image source={blue} style={styles.image} />
-            </View>
-
-            <View style={styles.header}>
-                <Text h2>Vancouver</Text>
-                <TouchableOpacity>
-                    <Ionicons name="heart-outline" size={30} color="white"/>
-                </TouchableOpacity>
-            </View>
-            <View style={styles.container}>
-                {/* you would add the temperature here for background color function to work, I assumed its gon be item.temperature */}
-                <Text h1>5°</Text>
-                <Text style={styles.description}>its cold and its raining.</Text>
-            </View>
-            <View style={styles.dataSection}>
-                <View style={styles.dataRow}>
-                    <View style={styles.data}>
-                        <Text h3>wind speed</Text>
-                        <Text style={theme.components.Text.bodyStyle}>17km/h</Text>
+                    <View style={styles.header}>
+                        <Text h2>Vancouver</Text>
+                        <TouchableOpacity>
+                            <Ionicons name="heart-outline" size={30} color="white" />
+                        </TouchableOpacity>
                     </View>
-                    <View style={styles.data}>
-                        <Text h3>pressure</Text>
-                        <Text style={theme.components.Text.bodyStyle}>1021hPa</Text>
+                    <View style={styles.container}>
+                        <Text h1>{weatherData.temp}°C</Text>
+                        <Text style={styles.description}>its {getDescription(weatherData.temp)} - {weatherData.weather}.</Text>
                     </View>
-                </View>
-                <View style={styles.dataRow}>
-                    <View style={styles.data}>
-                        <Text h3>coldest</Text>
-                        <Text style={theme.components.Text.bodyStyle}>-2°</Text>
+                    <View style={styles.dataSection}>
+                        <View style={styles.dataRow}>
+                            <View style={styles.data}>
+                                <Text h3>wind speed</Text>
+                                <Text style={theme.components.Text.bodyStyle}>{weatherData.windSpeed} m/s</Text>
+                            </View>
+                            <View style={styles.data}>
+                                <Text h3>pressure</Text>
+                                <Text style={theme.components.Text.bodyStyle}>{weatherData.pressure} hPa</Text>
+                            </View>
+                        </View>
+                        <View style={styles.dataRow}>
+                            <View style={styles.data}>
+                                <Text h3>coldest</Text>
+                                <Text style={theme.components.Text.bodyStyle}>{weatherData.minTemp}°C</Text>
+                            </View>
+                            <View style={styles.data}>
+                                <Text h3>hottest</Text>
+                                <Text style={theme.components.Text.bodyStyle}>{weatherData.maxTemp}°C</Text>
+                            </View>
+                        </View>
                     </View>
-                    <View style={styles.data}>
-                        <Text h3>hottest</Text>
-                        <Text style={theme.components.Text.bodyStyle}>5°</Text>
-                    </View>
-                </View>
-            </View>
+                </>
+            )}
         </View>
     );
 }
@@ -93,6 +146,7 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
+        marginTop: 60,
         textAlign: 'center',
         tintColor: '#F5F1F0',
     },

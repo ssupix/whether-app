@@ -40,6 +40,10 @@ export default function SearchScreen() {
                 name: data.name,
                 temp: `${Math.round(data.main.temp)}`, // Temperature is rounded to the nearest integer in Celsius
                 weather: data.weather[0].description, // Weather description
+                windSpeed: data.wind.speed, // Wind speed
+                pressure: data.main.pressure, // Pressure
+                minTemp: Math.round(data.main.temp_min), // Minimum temperature
+                maxTemp: Math.round(data.main.temp_max), // Maximum temperature
             };
 
             setLocationData([newLocationData]); // Update the location data array with the new data
@@ -112,13 +116,14 @@ export default function SearchScreen() {
                 <Ionicons name="search" size={24} color={theme.colors.grey} />
                 <TextInput
                 style={styles.searchInput}
-                placeholder="search"
+                placeholder="location"
                 value={searchQuery}
                 onChangeText={setSearchQuery}
                 />
                 <Button
                 onPress={fetchWeather}
                 title="search"
+                color={theme.colors.darkGrey}
                 />
             </View>
             <SwipeListView
