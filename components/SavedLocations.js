@@ -1,23 +1,47 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet,  View } from 'react-native';
-
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, View } from 'react-native';
 import { Text } from '@rneui/themed';
+import { theme } from '../style/theme';
+import { weatherQuotes } from '../data/weatherQuotes';
 
 export default function SavedLocationsScreen() {
+    const [quote, setQuote] = useState('');
+
+    useEffect(() => {
+        // Select a random quote on component mount
+        const randomQuote = weatherQuotes[Math.floor(Math.random() * weatherQuotes.length)];
+        setQuote(randomQuote);
+    }, []);
 
     return (
-        <View style={styles.container}>
-            <Text h1>saved</Text>
-            <StatusBar style="auto" />
+        <View style={styles.main}>
+            <View style={styles.header}>
+                <Text h2>Saved Locations</Text>
+            </View>
+            <View>
+                <Text style={styles.quote}>{quote}</Text>
+            </View>
         </View>
     );
 }
 
 const styles = StyleSheet.create({
-    container: {
+    main: {
+        padding: 30,
         flex: 1,
-        backgroundColor: '#fff',
-        alignItems: 'center',
-        justifyContent: 'center',
+        backgroundColor: theme.colors.grey,
+    },
+    header: {
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        maxHeight: 30,
+        marginTop: 40,
+    },
+    quote: {
+        fontSize: 20,
+        color: theme.colors.darkGrey,
+        fontStyle: 'italic',
+        marginTop: 20,
     },
 });

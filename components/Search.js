@@ -1,31 +1,67 @@
-import React, { useState } from 'react';
-import { StyleSheet, View, TextInput, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, View, TextInput, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
 import { Text, ListItem } from '@rneui/themed';
 import { Ionicons } from '@expo/vector-icons';
 import { SwipeListView } from 'react-native-swipe-list-view';
-import { data } from '../data/fakeWeather';
+// import { data } from '../data/fakeWeather';
 import { theme } from '../style/theme';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
+import { Button } from '@rneui/base';
 
 export default function SearchScreen() {
-    const [searchTerm, setSearchTerm] = useState('');
-    const [filteredData, setFilteredData] = useState(data);
+    // const [filteredData, setFilteredData] = useState(data);
+
+    const [searchQuery, setSearchQuery] = useState('');
+    const [locationData, setLocationData] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
     const navigation = useNavigation();
-    
-    const handleSearch = (text) => {
-        setSearchTerm(text);
-        const filtered = data.filter((item) =>
-        item.name.toLowerCase().includes(text.toLowerCase())
-        );
-        setFilteredData(filtered);
+
+    const apiKey = 'ee849bbc68bf05c148d0718840dcb225';
+    const apiUrl = 'https://api.openweathermap.org/data/2.5/weather';
+
+    const fetchWeather = async () => {
+        if (!searchQuery) return;
+
+        setLoading(true);
+        setError(null);
+
+        try {
+            const response = await fetch(`${apiUrl}?q=${searchQuery}&appid=${apiKey}&units=metric`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch location data');
+            }
+
+            const data = await response.json();
+
+            const newLocationData = {
+                id: data.coord.lat, // Use latitude coordinates as a unique ID
+                name: data.name,
+                temp: `${Math.round(data.main.temp)}`, // Temperature is rounded to the nearest integer in Celsius
+                weather: data.weather[0].description, // Weather description
+            };
+
+            setLocationData([newLocationData]); // Update the location data array with the new data
+        } catch (err) {
+            setError(err.message);
+            setLocationData([]);
+        } finally {
+            setLoading(false);
+        }
     };
+
+    useEffect(() => {
+        if (searchQuery.length < 1) {
+            fetchWeather();
+        }
+    }, [searchQuery]);
 
     const renderItem = ({ item }) => (
         
             <ListItem.Swipeable
                 linearGradientProps={
-                    getColorStyle(item.temperature)
+                    getColorStyle(item.temp)
                 }
                 ViewComponent={LinearGradient}
                 leftWidth={0}
@@ -47,11 +83,11 @@ export default function SearchScreen() {
                         {item.name}
                     </ListItem.Title>
                     <ListItem.Subtitle>
-                        {item.type}
+                        {item.weather}
                     </ListItem.Subtitle>
                 </ListItem.Content>
                 <Text style={styles.itemTemp}>
-                    {item.temperature}°
+                    {item.temp}°C
                 </Text>
                 </TouchableOpacity>
             </ListItem.Swipeable>
@@ -77,12 +113,16 @@ export default function SearchScreen() {
                 <TextInput
                 style={styles.searchInput}
                 placeholder="search"
-                value={searchTerm}
-                onChangeText={handleSearch}
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+                />
+                <Button
+                onPress={fetchWeather}
+                title="search"
                 />
             </View>
             <SwipeListView
-                data={filteredData}
+                data={locationData}
                 keyExtractor={(item) => item.name}
                 renderItem={renderItem}
                 leftActivationValue={100}
@@ -101,12 +141,9 @@ const styles = StyleSheet.create({
         backgroundColor: theme.colors.grey,
     },
     header: {
-        flex: 1,
-        flexDirection: 'row',
-        justifyContent: 'space-between',
         maxHeight: 30,
         marginTop: 40,
-        color: '#F5F1F0'
+        color: theme.colors.lightGrey
     },
     searchContainer: {
         flexDirection: 'row',

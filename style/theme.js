@@ -42,7 +42,7 @@ export const theme = createTheme ({
                 fontFamily: 'RethinkSans_Normal',
                 textTransform: 'lowercase',
                 fontWeight: 'regular',
-                letterSpacing: -2.5,
+                letterSpacing: -.5,
             },
             bodyStyle: {
                 fontSize: 20,
