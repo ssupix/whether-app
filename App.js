@@ -98,7 +98,7 @@ const App = () => {
                     fontFamily: 'RethinkSans_Normal',
                     textTransform: 'lowercase' 
                   },
-                  headerStyle: { backgroundColor: theme.colors.grey },
+                  headerStyle: { backgroundColor: '#D0CCC7' },
                   headerTintColor: theme.colors.white,
                 })}
               />

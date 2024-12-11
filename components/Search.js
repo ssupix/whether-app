@@ -166,8 +166,9 @@ const styles = StyleSheet.create({
         marginLeft: 8,
     },
     itemContainer: {
-        borderTopColor: theme.colors.lightGrey,
+        borderColor: theme.colors.lightGrey,
         borderTopWidth: 2,
+        borderBottomWidth: 2,
     },
     itemContent: {
         flexDirection: 'row',

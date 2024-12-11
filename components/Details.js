@@ -33,8 +33,6 @@ export default function Details({ route }) {
         }
     };
 
-    console.log(item);
-
     return (
         <View style={styles.main}>
 
