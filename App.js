@@ -47,6 +47,7 @@ const TabNavigator = () => (
       },
       tabBarShowLabel: false,
       headerShown: false,
+      
     })}
   >
     <Tab.Screen name="Home" component={Home} />

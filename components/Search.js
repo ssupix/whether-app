@@ -1,4 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Storage from 'react-native-storage';
+// import AsyncStorage from '@react-native-community/async-storage';
+
 import { StyleSheet, View, TextInput, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
 import { Text, ListItem } from '@rneui/themed';
 import { Ionicons } from '@expo/vector-icons';
@@ -14,6 +18,8 @@ export default function SearchScreen() {
 
     const [searchQuery, setSearchQuery] = useState('');
     const [locationData, setLocationData] = useState([]);
+    const [likedLocations, setLikedLocations] = useState([]);
+    const [history, setHistory] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const navigation = useNavigation();
@@ -47,11 +53,51 @@ export default function SearchScreen() {
             };
 
             setLocationData([newLocationData]); // Update the location data array with the new data
+            history.splice(0, 0, newLocationData);
+
         } catch (err) {
             setError(err.message);
             setLocationData([]);
         } finally {
             setLoading(false);
+        }
+    };
+
+    // Favourites
+    const handleFavs = async (location) => {
+        try {
+            // Retrieve current liked locations from AsyncStorage
+            const storedLocationsJson = await AsyncStorage.getItem('@likedLocations');
+            const currentLikedLocations = storedLocationsJson 
+                ? JSON.parse(storedLocationsJson) 
+                : [];
+    
+            // Check if the location already exists in the array
+            const locationExists = currentLikedLocations.some(
+                (locationItem) => locationItem.id === location.id
+            );
+    
+            let updatedLocations;
+            if (locationExists) {
+                // If it exists, remove it by filtering it out
+                updatedLocations = currentLikedLocations.filter(
+                    (locationItem) => locationItem.id !== location.id
+                );
+            } else {
+                // If it doesn't exist, add it to the array
+                updatedLocations = [...currentLikedLocations, location];
+            }
+    
+            // Save the updated locations back to AsyncStorage
+            await AsyncStorage.setItem(
+                '@likedLocations', 
+                JSON.stringify(updatedLocations)
+            );
+    
+            // Update local state (if you're using state management)
+            setLikedLocations(updatedLocations);
+        } catch (error) {
+            console.error('Error managing favorite locations:', error);
         }
     };
 
@@ -61,40 +107,51 @@ export default function SearchScreen() {
         }
     }, [searchQuery]);
 
+    // Check if this location is liked
+    const isLiked = likedLocations.some(
+        (likedLocation) => likedLocation.id === item.id
+    );
     const renderItem = ({ item }) => (
         
-            <ListItem.Swipeable
-                linearGradientProps={
-                    getColorStyle(item.temp)
-                }
-                ViewComponent={LinearGradient}
-                leftWidth={0}
-                rightWidth={60}
-                minSlideWidth={40}
-                style={styles.itemContainer}
-                rightContent={() => (
-                    <TouchableOpacity style={styles.hiddenItemContainer}>
-                        <Ionicons name="heart-outline" size={24} color={theme.colors.lightGrey} />
-                    </TouchableOpacity>
-                )}
-            >
+        <ListItem.Swipeable
+            linearGradientProps={
+                getColorStyle(item.temp)
+            }
+            ViewComponent={LinearGradient}
+            leftWidth={0}
+            rightWidth={60}
+            minSlideWidth={40}
+            style={styles.itemContainer}
+            rightContent={() => (
                 <TouchableOpacity 
-                    style={styles.itemContent}
-                    onPress={() => navigation.navigate('Details', { item })}
+                    style={styles.hiddenItemContainer}
+                    onPress={() => handleFavs(item)}
                 >
-                <ListItem.Content style={styles.itemDetails}>
-                    <ListItem.Title style={styles.itemText}>
-                        {item.name}
-                    </ListItem.Title>
-                    <ListItem.Subtitle>
-                        {item.weather}
-                    </ListItem.Subtitle>
-                </ListItem.Content>
-                <Text style={styles.itemTemp}>
-                    {item.temp}°C
-                </Text>
+                    <Ionicons 
+                        name={isLiked ? 'heart' : 'heart-outline'}  // Change icon based on state
+                        size={24} 
+                        color={theme.colors.lightGrey} 
+                    />
                 </TouchableOpacity>
-            </ListItem.Swipeable>
+            )}
+        >
+            <TouchableOpacity 
+                style={styles.itemContent}
+                onPress={() => navigation.navigate('Details', { item })}
+            >
+            <ListItem.Content style={styles.itemDetails}>
+                <ListItem.Title style={styles.itemText}>
+                    {item.name}
+                </ListItem.Title>
+                <ListItem.Subtitle>
+                    {item.weather}
+                </ListItem.Subtitle>
+            </ListItem.Content>
+            <Text style={styles.itemTemp}>
+                {item.temp}°C
+            </Text>
+            </TouchableOpacity>
+        </ListItem.Swipeable>
     );
 
     const getColorStyle = (temperature) => {
@@ -127,7 +184,7 @@ export default function SearchScreen() {
                 />
             </View>
             <SwipeListView
-                data={locationData}
+                data={history}
                 keyExtractor={(item) => item.name}
                 renderItem={renderItem}
                 leftActivationValue={100}
