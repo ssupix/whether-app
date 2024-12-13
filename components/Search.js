@@ -54,14 +54,14 @@ export default function SearchScreen() {
             const data = await response.json();
 
             const newLocationData = {
-                id: data.coord.lat, // Use latitude coordinates as a unique ID
+                id: data.coord.lat, 
                 name: data.name,
-                temp: `${Math.round(data.main.temp)}`, // Temperature is rounded to the nearest integer in Celsius
-                weather: data.weather[0].description, // Weather description
-                windSpeed: data.wind.speed, // Wind speed
-                pressure: data.main.pressure, // Pressure
-                minTemp: Math.round(data.main.temp_min), // Minimum temperature
-                maxTemp: Math.round(data.main.temp_max), // Maximum temperature
+                temp: `${Math.round(data.main.temp)}`,
+                weather: data.weather[0].description,
+                windSpeed: data.wind.speed, 
+                pressure: data.main.pressure, 
+                minTemp: Math.round(data.main.temp_min),
+                maxTemp: Math.round(data.main.temp_max),
             };
 
             setLocationData([newLocationData]); 
@@ -111,7 +111,6 @@ export default function SearchScreen() {
                 JSON.stringify(updatedLocations)
             );
     
-            // Update local state
             setLikedLocations(updatedLocations);
         } catch (error) {
             console.error('Error managing favorite locations:', error);
@@ -130,7 +129,7 @@ export default function SearchScreen() {
     };
 
     const renderItem = ({ item }) => {
-        // Move the isLiked check inside the renderItem function
+
         const isLiked = likedLocations.some(
             (likedLocation) => likedLocation.id === item.id
         );
