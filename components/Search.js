@@ -194,9 +194,6 @@ export default function SearchScreen() {
                     color={theme.colors.darkGrey}
                 />
             </View>
-            <View>
-                <Text style={styles.swipeText}>swipe to save</Text>
-            </View>
             {loading ? (
                 <ActivityIndicator size="large" color={theme.colors.orange} />
             ) : error ? (
@@ -212,6 +209,9 @@ export default function SearchScreen() {
                     style={styles.flatList}
                 />
             )}
+            <View>
+                <Text style={styles.swipeText}>swipe left to save!</Text>
+            </View>
         </View>
     );
 }
@@ -243,14 +243,19 @@ const styles = StyleSheet.create({
         marginLeft: 8,
     },
     swipeText: {
-        color: theme.colors.lightGrey,
+        width: '100%',
+        textAlign: 'center',
         fontSize: 16,
+        marginTop: 40,
+        marginBottom: 30,
+        color: theme.colors.darkGrey,
+        opacity: 0.5,
         fontFamily: 'RethinkSans_Normal',
     },
     itemContainer: {
         borderColor: theme.colors.lightGrey,
         borderTopWidth: 2,
-        borderBottomWidth: 0,
+        borderBottomWidth: 2,
     },
     itemContent: {
         flexDirection: 'row',

@@ -118,9 +118,6 @@ export default function SavedLocationsScreen() {
             <View style={styles.header}>
                 <Text h2>Saved Locations</Text>
             </View>
-            <View>
-                <Text style={styles.quote}>{quote}</Text>
-            </View>
             {likedLocations.length > 0 ? (
                 <SwipeListView
                     data={likedLocations}
@@ -132,8 +129,11 @@ export default function SavedLocationsScreen() {
                     style={styles.flatList}
                 />
             ) : (
-                <Text style={styles.emptyText}>No saved locations yet</Text>
+                <Text style={styles.emptyText}>no saved locations yet...</Text>
             )}
+            <View>
+                <Text style={styles.quote}>{quote}</Text>
+            </View>
         </View>
     );
 }
@@ -160,7 +160,7 @@ const styles = StyleSheet.create({
     itemContainer: {
         borderColor: theme.colors.lightGrey,
         borderTopWidth: 2,
-        borderBottomWidth: 0,
+        borderBottomWidth: 2,
     },
     itemContent: {
         flexDirection: 'row',
@@ -192,9 +192,13 @@ const styles = StyleSheet.create({
         margin: 8,
     },
     emptyText: {
+        width: '100%',
         textAlign: 'center',
-        marginTop: 20,
+        fontSize: 16,
+        marginTop: 40,
+        marginBottom: 30,
         color: theme.colors.darkGrey,
+        opacity: 0.5,
         fontFamily: 'RethinkSans_Normal',
     },
     flatList: {
