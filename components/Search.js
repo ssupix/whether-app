@@ -1,21 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Storage from 'react-native-storage';
-// import AsyncStorage from '@react-native-community/async-storage';
 
-import { StyleSheet, View, TextInput, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
+import { StyleSheet, View, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Text, ListItem } from '@rneui/themed';
 import { Ionicons } from '@expo/vector-icons';
 import { SwipeListView } from 'react-native-swipe-list-view';
-// import { data } from '../data/fakeWeather';
 import { theme } from '../style/theme';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import { Button } from '@rneui/base';
 
 export default function SearchScreen() {
-    // const [filteredData, setFilteredData] = useState(data);
-
     const [searchQuery, setSearchQuery] = useState('');
     const [locationData, setLocationData] = useState([]);
     const [likedLocations, setLikedLocations] = useState([]);
@@ -26,6 +21,23 @@ export default function SearchScreen() {
 
     const apiKey = 'ee849bbc68bf05c148d0718840dcb225';
     const apiUrl = 'https://api.openweathermap.org/data/2.5/weather';
+
+    // Load liked locations on component mount
+    useEffect(() => {
+        const loadLikedLocations = async () => {
+            try {
+                const storedLocationsJson = await AsyncStorage.getItem('@likedLocations');
+                if (storedLocationsJson) {
+                    const currentLikedLocations = JSON.parse(storedLocationsJson);
+                    setLikedLocations(currentLikedLocations);
+                }
+            } catch (error) {
+                console.error('Error loading liked locations:', error);
+            }
+        };
+
+        loadLikedLocations();
+    }, []);
 
     const fetchWeather = async () => {
         if (!searchQuery) return;
@@ -52,8 +64,13 @@ export default function SearchScreen() {
                 maxTemp: Math.round(data.main.temp_max), // Maximum temperature
             };
 
-            setLocationData([newLocationData]); // Update the location data array with the new data
-            history.splice(0, 0, newLocationData);
+            setLocationData([newLocationData]); 
+            
+            // Prevent duplicate entries in history
+            const isAlreadyInHistory = history.some(item => item.id === newLocationData.id);
+            if (!isAlreadyInHistory) {
+                setHistory(prevHistory => [newLocationData, ...prevHistory]);
+            }
 
         } catch (err) {
             setError(err.message);
@@ -94,74 +111,69 @@ export default function SearchScreen() {
                 JSON.stringify(updatedLocations)
             );
     
-            // Update local state (if you're using state management)
+            // Update local state
             setLikedLocations(updatedLocations);
         } catch (error) {
             console.error('Error managing favorite locations:', error);
         }
     };
 
-    useEffect(() => {
-        if (searchQuery.length < 1) {
-            fetchWeather();
-        }
-    }, [searchQuery]);
-
-    // Check if this location is liked
-    const isLiked = likedLocations.some(
-        (likedLocation) => likedLocation.id === item.id
-    );
-    const renderItem = ({ item }) => (
-        
-        <ListItem.Swipeable
-            linearGradientProps={
-                getColorStyle(item.temp)
-            }
-            ViewComponent={LinearGradient}
-            leftWidth={0}
-            rightWidth={60}
-            minSlideWidth={40}
-            style={styles.itemContainer}
-            rightContent={() => (
-                <TouchableOpacity 
-                    style={styles.hiddenItemContainer}
-                    onPress={() => handleFavs(item)}
-                >
-                    <Ionicons 
-                        name={isLiked ? 'heart' : 'heart-outline'}  // Change icon based on state
-                        size={24} 
-                        color={theme.colors.lightGrey} 
-                    />
-                </TouchableOpacity>
-            )}
-        >
-            <TouchableOpacity 
-                style={styles.itemContent}
-                onPress={() => navigation.navigate('Details', { item })}
-            >
-            <ListItem.Content style={styles.itemDetails}>
-                <ListItem.Title style={styles.itemText}>
-                    {item.name}
-                </ListItem.Title>
-                <ListItem.Subtitle>
-                    {item.weather}
-                </ListItem.Subtitle>
-            </ListItem.Content>
-            <Text style={styles.itemTemp}>
-                {item.temp}°C
-            </Text>
-            </TouchableOpacity>
-        </ListItem.Swipeable>
-    );
-
     const getColorStyle = (temperature) => {
-        if (temperature < 7) {
-        return {colors: ["#4464A9", "#BDB6AD"], start: { x: 1, y: 0 }, end: { x: 0.6, y: 0 }};
-        } else if (temperature >= 7 && temperature <= 15) {
-        return {colors: ["#C88F34", "#BDB6AD"], start: { x: 1, y: 0 }, end: { x: 0.6, y: 0 }};
+        const temp = parseInt(temperature);
+        if (temp < 7) {
+            return {colors: ["#4464A9", "#BDB6AD"], start: { x: 1, y: 0 }, end: { x: 0.6, y: 0 }};
+        } else if (temp >= 7 && temp <= 15) {
+            return {colors: ["#C88F34", "#BDB6AD"], start: { x: 1, y: 0 }, end: { x: 0.6, y: 0 }};
         } else {
-        return {colors: ["#C85934", "#BDB6AD"], start: { x: 1, y: 0 }, end: { x: 0.6, y: 0 }};
+            return {colors: ["#C85934", "#BDB6AD"], start: { x: 1, y: 0 }, end: { x: 0.6, y: 0 }};
         }
+    };
+
+    const renderItem = ({ item }) => {
+        // Move the isLiked check inside the renderItem function
+        const isLiked = likedLocations.some(
+            (likedLocation) => likedLocation.id === item.id
+        );
+
+        return (
+            <ListItem.Swipeable
+                linearGradientProps={getColorStyle(item.temp)}
+                ViewComponent={LinearGradient}
+                leftWidth={0}
+                rightWidth={60}
+                minSlideWidth={40}
+                style={styles.itemContainer}
+                rightContent={() => (
+                    <TouchableOpacity 
+                        style={styles.hiddenItemContainer}
+                        onPress={() => handleFavs(item)}
+                    >
+                        <Ionicons 
+                            name={isLiked ? 'heart' : 'heart-outline'}
+                            size={24} 
+                            color={theme.colors.lightGrey} 
+                        />
+                    </TouchableOpacity>
+                )}
+            >
+                <TouchableOpacity 
+                    style={styles.itemContent}
+                    onPress={() => navigation.navigate('Details', { item })}
+                >
+                    <ListItem.Content style={styles.itemDetails}>
+                        <ListItem.Title style={styles.itemText}>
+                            {item.name}
+                        </ListItem.Title>
+                        <ListItem.Subtitle>
+                            {item.weather}
+                        </ListItem.Subtitle>
+                    </ListItem.Content>
+                    <Text style={styles.itemTemp}>
+                        {item.temp}°C
+                    </Text>
+                </TouchableOpacity>
+            </ListItem.Swipeable>
+        );
     };
 
     return (
@@ -172,26 +184,35 @@ export default function SearchScreen() {
             <View style={styles.searchContainer}>
                 <Ionicons name="search" size={24} color={theme.colors.grey} />
                 <TextInput
-                style={styles.searchInput}
-                placeholder="location"
-                value={searchQuery}
-                onChangeText={setSearchQuery}
+                    style={styles.searchInput}
+                    placeholder="location"
+                    value={searchQuery}
+                    onChangeText={setSearchQuery}
                 />
                 <Button
-                onPress={fetchWeather}
-                title="search"
-                color={theme.colors.darkGrey}
+                    onPress={fetchWeather}
+                    title="search"
+                    color={theme.colors.darkGrey}
                 />
             </View>
-            <SwipeListView
-                data={history}
-                keyExtractor={(item) => item.name}
-                renderItem={renderItem}
-                leftActivationValue={100}
-                leftActionValue={0}
-                leftActionActivationValue={100}
-                style={styles.flatList}
-            />
+            <View>
+                <Text style={styles.swipeText}>swipe to save</Text>
+            </View>
+            {loading ? (
+                <ActivityIndicator size="large" color={theme.colors.orange} />
+            ) : error ? (
+                <Text style={styles.errorText}>{error}</Text>
+            ) : (
+                <SwipeListView
+                    data={history}
+                    keyExtractor={(item) => item.name}
+                    renderItem={renderItem}
+                    leftActivationValue={100}
+                    leftActionValue={0}
+                    leftActionActivationValue={100}
+                    style={styles.flatList}
+                />
+            )}
         </View>
     );
 }
@@ -222,10 +243,15 @@ const styles = StyleSheet.create({
         fontFamily: 'RethinkSans_Normal',
         marginLeft: 8,
     },
+    swipeText: {
+        color: theme.colors.lightGrey,
+        fontSize: 16,
+        fontFamily: 'RethinkSans_Normal',
+    },
     itemContainer: {
         borderColor: theme.colors.lightGrey,
         borderTopWidth: 2,
-        borderBottomWidth: 2,
+        borderBottomWidth: 0,
     },
     itemContent: {
         flexDirection: 'row',
@@ -256,13 +282,12 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         margin: 8,
     },
-    blue: {
-        backgroundColor: theme.colors.blue,
+    errorText: {
+        color: 'red',
+        textAlign: 'center',
+        marginTop: 20,
     },
-    yellow: {
-        backgroundColor: theme.colors.yellow,
-    },
-    orange: {
-        backgroundColor: theme.colors.orange,
-    },
+    flatList: {
+        marginTop: 10,
+    }
 });

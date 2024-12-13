@@ -85,9 +85,6 @@ export default function HomeScreen() {
 
                     <View style={styles.header}>
                         <Text h2>Vancouver</Text>
-                        <TouchableOpacity>
-                            <Ionicons name="heart-outline" size={30} color="white" />
-                        </TouchableOpacity>
                     </View>
                     <View style={styles.container}>
                         <Text h1>{weatherData.temp}°C</Text>
